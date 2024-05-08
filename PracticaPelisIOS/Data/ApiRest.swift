@@ -7,50 +7,45 @@
 
 import Foundation
 
-class searchResponse:Codable {
-    var search:[Film]
-    var totalResults:Int
-    var response:Bool
+struct SearchResponse:Codable {
+    let Search:[Film]
+    let totalResults:String
+    let Response:String
 }
 
-class IdResponse:Codable{
-    var title:String
-    var year:Int
-    var runtime:String
-    var genre:String
-    var director:String
-    var plot:String
-    var country:String
-    var poster:String
-    var imdbID:String
-    var response:Bool
-    
-    func toFilm()->Film {
-        var newFilm=Film(title:title,year:year,runtime:runtime,genre:genre,director:director,plot:plot,country:country,poster:poster,imdbID:imdbID)
-        return newFilm
-    }
+struct IdResponse:Codable{
+    let Title:String
+    let Year:String
+    let Runtime:String?
+    let Genre:String?
+    let Director:String?
+    let Plot:String?
+    let Country:String?
+    let Poster:String?
+    let imdbID:String?
+    let Response:String
 }
 
-class Film:Codable {
-    var title:String
-    var year:Int
-    var runtime:String
-    var genre:String
-    var director:String
-    var plot:String
-    var country:String
-    var poster:String
-    var imdbID:String
+struct Film:Codable {
+    let Title:String
+    let Year:String
+    let Runtime:String?
+    let Genre:String?
+    let Director:String?
+    let Plot:String?
+    let Country:String?
+    let Poster:String?
+    let imdbID:String?
     
-    init(title: String, year: Int, runtime: String, genre: String, director: String, plot: String, country: String, poster: String, imdbID: String) {
-        self.title = title
-        self.year = year
-        self.runtime = runtime
-        self.genre = genre
-        self.director = director
-        self.plot = plot
-        self.country = country
-        self.poster = poster
+    init(title: String, year: String, runtime: String, genre: String, director: String, plot: String, country: String, poster: String, imdbID: String) {
+        self.Title = title
+        self.Year = year
+        self.Runtime = runtime
+        self.Genre = genre
+        self.Director = director
+        self.Plot = plot
+        self.Country = country
+        self.Poster = poster
         self.imdbID = imdbID
     }
 }
@@ -100,7 +95,7 @@ class ApiHttp {
     }
     
     private func performAPICall(urlString:String, tipo:Int) async throws -> [Film] {
-        var response1:searchResponse?=nil
+        var response1:SearchResponse?=nil
         var response2:IdResponse?=nil
         var retorno:[Film]=[]
         //Establecer URL
@@ -114,18 +109,34 @@ class ApiHttp {
         // decoder.keyDecodingStrategy = .convertFromSnakeCase
         do {
             if tipo==1 {
-                response1 = try decoder.decode(type(of: response1), from: data)
-                retorno=response1!.search
+                response1 = try decoder.decode(SearchResponse.self, from: data)
+                print ("Parseado: \(response1?.Search)")
+                retorno=response1!.Search
             } else {
-                response2 = try decoder.decode(type(of: response2), from: data)
-                retorno.append(response2!.toFilm())
+                response2 = try decoder.decode(IdResponse.self, from: data)
+                let film:Film=toFilm(res:response2!)
+                retorno.append(film)
             }
+        } catch {
+            print(error)
         }
         print ("Decoder Terminado")
         
         return (retorno)
     }
     
+    func toFilm(res:IdResponse)->Film {
+        var newFilm=Film(title:res.Title,
+                         year:res.Year,
+                         runtime:res.Runtime!,
+                         genre:res.Genre!,
+                         director:res.Director!,
+                         plot:res.Plot!,
+                         country:res.Country!,
+                         poster:res.Poster!,
+                         imdbID:res.imdbID!)
+        return newFilm
+    }
     
         
     

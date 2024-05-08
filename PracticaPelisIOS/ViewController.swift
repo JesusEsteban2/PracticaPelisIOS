@@ -34,7 +34,7 @@ class ViewController: UIViewController, UISearchBarDelegate, UITableViewDataSour
         Task{
             do {
                 try await model = api.searchByName(query: searchBar.text!)
-                print ("Prueba recibida: \(model[0].title)")
+                print ("Prueba recibida: \(model[0].Title)")
             
             } catch {
                 print ("No se ha podido conectar")
@@ -50,7 +50,7 @@ class ViewController: UIViewController, UISearchBarDelegate, UITableViewDataSour
     
         let fila = model[indexPath.row]
 
-        cell.render(imagen:fila.poster, titulo:fila.title)
+        cell.render(imagen:fila.Poster!, titulo:fila.Title)
     
         return cell
     }
@@ -68,9 +68,11 @@ class ViewController: UIViewController, UISearchBarDelegate, UITableViewDataSour
                case "goToDetail":
                    let destinationViewControler=segue.destination as! DetailViewController
             
-                   let fila=tableView.indexPathForSelectedRow
+                    let fila=tableView.indexPathForSelectedRow
+                    let peli=model[fila!.row]
+                    
                    // print ("La fila seleccionada es: \(fila!.row)")
-                   destinationViewControler.filmParam=model[fila!.row]
+                   destinationViewControler.filmParam=peli
                default:
                    return
                }
